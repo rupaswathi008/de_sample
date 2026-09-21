@@ -2,7 +2,7 @@ import boto3
 from kafka import KafkaConsumer
 import json
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 
@@ -42,10 +42,14 @@ def write_to_minio(table_name, records):
     if not records:
         return
     df = pd.DataFrame(records)
-    date_str = datetime.now().strftime('%Y-%m-%d')
+
+    # Use timezone-aware datetime
+    now = datetime.now(timezone.utc)
+    date_str = now.strftime('%Y-%m-%d')
     file_path = f'{table_name}_{date_str}.parquet'
     df.to_parquet(file_path, engine='fastparquet', index=False)
-    s3_key = f'{table_name}/date={date_str}/{table_name}_{datetime.now().strftime("%H%M%S%f")}.parquet'
+
+    s3_key = f'{table_name}/date={date_str}/{table_name}_{now.strftime("%H%M%S%f")}.parquet'
     s3.upload_file(file_path, bucket, s3_key)
     os.remove(file_path)
     print(f'✅ Uploaded {len(records)} records to s3://{bucket}/{s3_key}')
