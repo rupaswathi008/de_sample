@@ -37,16 +37,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install dbt-snowflake
+          pip install dbt-snowflake ruff pytest
 
-      - name: Run linters
+      - name: Run linters (auto-fix)
         run: |
-          pip install ruff
-          ruff check .
+          ruff check . --fix
 
       - name: Run unit tests
         run: |
-          pip install pytest
           pytest tests/ || echo "No tests yet"
 
       - name: Setup dbt profile
