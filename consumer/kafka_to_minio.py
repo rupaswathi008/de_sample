@@ -2,7 +2,7 @@ import boto3
 from kafka import KafkaConsumer
 import json
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timezone
 import os
 from dotenv import load_dotenv
 
